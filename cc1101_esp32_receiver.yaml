@@ -1,0 +1,84 @@
+# ============================================================
+# RECEIVER RF 433mhz 
+# CC1101 E07-M1101D-TH → ESP-32S nodemcu v1.1 101010
+# ============================================================
+#  CC1101  →    ESP-32S
+# ============================================================
+#  1 GND   →    GND
+#  2 VCC   →    3V3
+#  3 GDO0  →    NC  (émission)
+#  4 CSN   →    P5
+#  5 SCK   →    P18
+#  6 MOSI  →    P23 
+#  7 MISO  →    P19 
+#  8 GDO2  →    P33 (réception)
+# ============================================================
+# ============================================================
+
+
+substitutions:
+  device_name: cc1101-recepteur
+  friendly_name: CC1101 RECEIVER RF 433mhz with ESP-32S nodemcu v1.1 101010
+  comment: >
+    CC1101 Texas Instrument E07-M1101D-TH with ESP-32S nodemcu v1.1 101010 :
+    Receiver RF 433mhz for  decode trame RF
+    
+esphome:
+  name: ${device_name}
+  friendly_name: ${friendly_name}
+
+esp32:
+  board: nodemcu-32s
+  framework:
+    type: arduino
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  ap:
+    ssid: "${device_name} Fallback"
+    password: !secret ap_password
+
+logger:
+  level: DEBUG
+  #level: DEBUG
+  
+api:
+
+web_server:
+  port: 80
+
+ota:
+  - platform: esphome
+
+# ============================================================
+# SPI CC1101
+# ============================================================
+spi:
+  clk_pin: GPIO18
+  mosi_pin: GPIO23
+  miso_pin: GPIO19
+
+# ============================================================
+# CC1101 TI E07-M1101D-TH 433MHZ V2.0
+# ============================================================
+cc1101:
+  cs_pin: GPIO5
+  frequency: 433.92MHz
+  modulation_type: "ASK/OOK"
+  symbol_rate: 5000
+  filter_bandwidth: 325kHz
+
+# ============================================================
+# RECEIVER RF - GPIO33 (P33)
+# ============================================================
+remote_receiver:
+  pin:
+    number: GPIO33
+  dump:
+    - raw
+  tolerance: 60%
+  filter: 10us
+  idle: 32767us
+  buffer_size: 4096
+  rmt_symbols: 256
